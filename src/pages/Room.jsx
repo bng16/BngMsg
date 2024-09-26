@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import {
+import client, {
   databases,
   DATABASE_ID,
   COLLECTION_ID_MESSAGES,
 } from "../appwriteConfig";
 
-import { ID } from "appwrite";
+import { ID, Query } from "appwrite";
+
+import { MdOutlineDelete } from "react-icons/md";
 
 // Helper function to format the date
 const formatDate = (dateString) => {
@@ -27,10 +29,35 @@ function Room() {
 
   useEffect(() => {
     getMessages();
+
+    const unsubscribe = client.subscribe(
+      `databases.${DATABASE_ID}.collections.${COLLECTION_ID_MESSAGES}.documents`,
+      (response) => {
+        if (
+          response.events.includes(
+            "databases.*.collections.*.documents.*.create"
+          )
+        ) {
+          setMessages((prev) => [...prev, response.payload]);
+        }
+        if (
+          response.events.includes(
+            "databases.*.collections.*.documents.*.delete"
+          )
+        ) {
+          setMessages((prev) =>
+            prev.filter((message) => message.$id !== response.payload.$id)
+          );
+        }
+      }
+    );
+
+    return () => {
+      unsubscribe(); // Correctly call the unsubscribe function
+    };
   }, []);
 
   useEffect(() => {
-    // Scroll to the bottom every time messages change
     scrollToBottom();
   }, [messages]);
 
@@ -43,26 +70,30 @@ function Room() {
 
     let payload = {
       body: messageBody,
-      user_name: "Unknown",
+      user_name: "Unknown", // Example username, you might want to replace this with the actual username logic
     };
 
-    let response = await databases.createDocument(
+    await databases.createDocument(
       DATABASE_ID,
       COLLECTION_ID_MESSAGES,
       ID.unique(),
       payload
     );
 
-    setMessages([...messages, response]);
     setMessageBody("");
   };
 
   const getMessages = async () => {
     const response = await databases.listDocuments(
       DATABASE_ID,
-      COLLECTION_ID_MESSAGES
+      COLLECTION_ID_MESSAGES,
+      [Query.limit(150)]
     );
     setMessages(response.documents);
+  };
+
+  const deleteMessage = async (MSG_ID) => {
+    await databases.deleteDocument(DATABASE_ID, COLLECTION_ID_MESSAGES, MSG_ID);
   };
 
   return (
@@ -70,11 +101,11 @@ function Room() {
       id="screen"
       className="w-screen h-screen bg-gray-950 flex justify-center overflow-hidden"
     >
-      <div id="main" className="w-[60%] h-full bg-gray-900 px-4 py-4 flex flex-col">
-        <div
-          id="msgs-container"
-          className="h-full overflow-y-scroll"
-        >
+      <div
+        id="main"
+        className="w-[60%] h-full bg-gray-900 px-4 py-4 flex flex-col"
+      >
+        <div id="msgs-container" className="h-full overflow-y-scroll">
           {messages.map((message) => (
             <div
               id="msg"
@@ -90,8 +121,14 @@ function Room() {
                 </h6>
               </div>
 
-              <div className="bg-[#F02D65] px-4 py-2 rounded-md text-white font-medium text-md text-left w-fit max-w-[70%] break-words">
-                {message.body}
+              <div className="flex items-center">
+                <div className="bg-[#F02D65] px-4 py-2 rounded-md mr-2 text-white font-medium text-md text-left w-fit max-w-[70%] break-words">
+                  {message.body}
+                </div>
+                <MdOutlineDelete
+                  className="text-white text-xl opacity-50 hover:opacity-100 cursor-pointer"
+                  onClick={() => deleteMessage(message.$id)} // Use arrow function to prevent immediate execution
+                />
               </div>
             </div>
           ))}
@@ -112,7 +149,7 @@ function Room() {
             placeholder="Say something..."
             onChange={(e) => setMessageBody(e.target.value)}
             value={messageBody}
-            style={{ overflowY: "auto" }} 
+            style={{ overflowY: "auto" }}
           />
           <input
             type="submit"
