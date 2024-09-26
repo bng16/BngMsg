@@ -10,5 +10,5 @@ client
   .setEndpoint("https://cloud.appwrite.io/v1")
   .setProject("66f40a450039be727c5b");
 
-export const datanases = new Databases(client);
+export const databases = new Databases(client);
 export default client;
