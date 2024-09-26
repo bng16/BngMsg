@@ -1,20 +1,22 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-
 import Room from "./pages/Room";
 import LoginPage from "./pages/LoginPage";
 
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import PrivateRotes from "./components/PrivateRotes";
+import { AuthProvider } from "./utils/AuthContext";
 
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
+      <AuthProvider>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
 
-        <Route element={<PrivateRotes />}>
-          <Route path="/" element={<Room />} />
-        </Route>
-      </Routes>
+          <Route element={<PrivateRotes />}>
+            <Route path="/" element={<Room />} />
+          </Route>
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   );
 }
