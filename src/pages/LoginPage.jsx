@@ -25,8 +25,8 @@ function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-950">
-      <div className="max-w-md w-full bg-gray-900 p-8 rounded-lg shadow-md">
+    <div className="min-h-screen flex items-center justify-center bg-gray-950 ">
+      <div className="max-w-md w-full bg-gray-900 p-8 rounded-lg shadow-md ">
         <h2 className="text-2xl font-bold mb-6 text-center text-white">Login</h2>
         <form onSubmit={(e) => { handleUserLogin(e, credentials) }}>
           {/* Error Message */}
@@ -75,7 +75,7 @@ function LoginPage() {
             />
           </div>
         </form>
-        <p>Dont have an account? Register <Link to="/register">here</Link></p>
+        <p className='text-white mt-2'>Dont have an account? Register <Link className='text-blue-500' to="/register">here</Link></p>
       </div>
     </div>
   );

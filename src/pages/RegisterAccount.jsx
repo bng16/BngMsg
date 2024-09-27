@@ -1,22 +1,34 @@
 import React, { useState } from 'react';
+import { Link } from "react-router-dom";
+import { useAuth } from '../utils/AuthContext';
 
 function RegisterAccount() {
-  const [formData, setFormData] = useState({
+
+  const { handleUserRegister } = useAuth();
+
+  const [credentials, setCredentials] = useState({
     username: '',
     email: '',
     password: '',
     password2: '',
   });
 
+  const [error, setError] = useState('');
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setCredentials({ ...credentials, [name]: value });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle registration logic here
-    console.log("Account created:", formData);
+    if (credentials.password !== credentials.password2) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    // Proceed with registration if passwords match
+    handleUserRegister(credentials);
   };
 
   return (
@@ -36,7 +48,7 @@ function RegisterAccount() {
               id="username"
               className="w-full px-3 py-2 border border-gray-700 bg-gray-800 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-pink-600"
               placeholder="Enter your username..."
-              value={formData.username}
+              value={credentials.username}
               onChange={handleInputChange}
             />
           </div>
@@ -53,7 +65,7 @@ function RegisterAccount() {
               id="email"
               className="w-full px-3 py-2 border border-gray-700 bg-gray-800 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-pink-600"
               placeholder="Enter your email..."
-              value={formData.email}
+              value={credentials.email}
               onChange={handleInputChange}
             />
           </div>
@@ -70,8 +82,10 @@ function RegisterAccount() {
               id="password"
               className="w-full px-3 py-2 border border-gray-700 bg-gray-800 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-pink-600"
               placeholder="Enter your password..."
-              value={formData.password}
+              value={credentials.password}
               onChange={handleInputChange}
+              pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).{8,}"
+              title="Password must contain at least 8 characters, including one uppercase letter, one lowercase letter, one number, and one special character."
             />
           </div>
 
@@ -87,10 +101,13 @@ function RegisterAccount() {
               id="password2"
               className="w-full px-3 py-2 border border-gray-700 bg-gray-800 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-pink-600"
               placeholder="Confirm your password..."
-              value={formData.password2}
+              value={credentials.password2}
               onChange={handleInputChange}
             />
           </div>
+
+          {/* Error Message */}
+          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
           {/* Submit Button */}
           <div className="flex items-center justify-between">
@@ -101,6 +118,7 @@ function RegisterAccount() {
             />
           </div>
         </form>
+        <p className="text-white mt-2">Already have an account? Login <Link className="text-blue-500" to="/login">here</Link></p>
       </div>
     </div>
   );

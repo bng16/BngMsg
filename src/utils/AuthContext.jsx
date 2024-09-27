@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect, useContext } from "react";
 import { account } from "../appwriteConfig";
 import { useNavigate } from "react-router-dom";
+import { ID } from "appwrite";
 
 const AuthContext = createContext();
 
@@ -29,9 +30,9 @@ export const AuthProvider = ({ children }) => {
 
     try {
       await account.createEmailPasswordSession(credentials.email, credentials.password);
-      const accountDetails = await account.get(); // Await the promise here as well
+      const accountDetails = await account.get();
       setUser(accountDetails);
-      navigate('/'); // Redirect after successful login
+      navigate('/');
     } catch (error) {
       console.error("Login error:", error);
     }
@@ -42,10 +43,32 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const handleUserRegister = async (credentials) => {
+
+    try {
+      // Register user with email, password, and username
+      await account.create(
+        ID.unique(),
+        credentials.email,
+        credentials.password,
+        credentials.username
+      );
+
+      // Log user in after registration
+      await account.createEmailPasswordSession(credentials.email, credentials.password);
+      const accountDetails = await account.get();
+      setUser(accountDetails);
+      navigate('/');
+    } catch (error) {
+      console.error("Registration error:", error);
+    }
+  };
+
   const contextData = {
     user,
     handleUserLogin,
     handleUserLogout,
+    handleUserRegister,
   };
 
   return (
