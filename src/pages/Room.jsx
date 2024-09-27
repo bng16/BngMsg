@@ -8,7 +8,7 @@ import client, {
 import { useAuth } from "../utils/AuthContext";
 
 
-import { ID, Query } from "appwrite";
+import { ID, Query, Role, Permission } from "appwrite";
 
 import { MdOutlineDelete } from "react-icons/md";
 
@@ -32,6 +32,7 @@ function Room() {
   const [messageBody, setMessageBody] = useState("");
   const messagesEndRef = useRef(null); // Reference for scrolling
   const { user } = useAuth();
+  console.log("userId",user.$id)
 
 
   useEffect(() => {
@@ -60,7 +61,7 @@ function Room() {
     );
 
     return () => {
-      unsubscribe(); // Correctly call the unsubscribe function
+      unsubscribe();
     };
   }, []);
 
@@ -82,12 +83,19 @@ function Room() {
       user_Id:user.$id
     };
 
+
+    let permissions=[
+      Permission.write(Role.user(user.$id)),
+    ]
+
     await databases.createDocument(
       DATABASE_ID,
       COLLECTION_ID_MESSAGES,
       ID.unique(),
-      payload
+      payload,
+      permissions,
     );
+
 
     setMessageBody("");
   };
@@ -117,6 +125,7 @@ function Room() {
         <Header/>
         <div id="msgs-container" className="h-full overflow-y-scroll">
           {messages.map((message) => (
+            // console.log('msg_uid',message.user_Id)
             <div
               id="msg"
               key={message.$id}
@@ -135,11 +144,11 @@ function Room() {
                 <div className="bg-[#F02D65] px-4 py-2 rounded-md mr-2 text-white font-medium text-md text-left w-fit max-w-[70%] break-words">
                   {message.body}
                 </div>
-                <MdOutlineDelete
+                {message.$permissions.includes(`delete(\"user:${user.$id}\")`) && <MdOutlineDelete
                   className="text-white text-xl opacity-50 hover:opacity-100 cursor-pointer"
-                  onClick={() => deleteMessage(message.$id)} // Use arrow function to prevent immediate execution
-                />
-              </div>
+                  onClick={() => deleteMessage(message.$id)}
+                />}
+                              </div>
             </div>
           ))}
           {/* Dummy div for auto-scrolling to the bottom */}
@@ -173,3 +182,6 @@ function Room() {
 }
 
 export default Room;
+
+
+
