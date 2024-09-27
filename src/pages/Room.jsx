@@ -5,9 +5,14 @@ import client, {
   COLLECTION_ID_MESSAGES,
 } from "../appwriteConfig";
 
+import { useAuth } from "../utils/AuthContext";
+
+
 import { ID, Query } from "appwrite";
 
 import { MdOutlineDelete } from "react-icons/md";
+
+import Header from "../components/Header";
 
 // Helper function to format the date
 const formatDate = (dateString) => {
@@ -26,6 +31,8 @@ function Room() {
   const [messages, setMessages] = useState([]);
   const [messageBody, setMessageBody] = useState("");
   const messagesEndRef = useRef(null); // Reference for scrolling
+  const { user } = useAuth();
+
 
   useEffect(() => {
     getMessages();
@@ -67,10 +74,12 @@ function Room() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
 
     let payload = {
       body: messageBody,
-      user_name: "Unknown", // Example username, you might want to replace this with the actual username logic
+      user_name: user.name,
+      user_Id:user.$id
     };
 
     await databases.createDocument(
@@ -105,6 +114,7 @@ function Room() {
         id="main"
         className="w-[60%] h-full bg-gray-900 px-4 py-4 flex flex-col"
       >
+        <Header/>
         <div id="msgs-container" className="h-full overflow-y-scroll">
           {messages.map((message) => (
             <div
@@ -154,7 +164,7 @@ function Room() {
           <input
             type="submit"
             className="bg-pink-600 text-white font-semibold py-2 rounded-md px-5"
-            value="Send"
+            value='Send'
           />
         </form>
       </div>

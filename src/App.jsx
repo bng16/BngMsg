@@ -1,5 +1,6 @@
 import Room from "./pages/Room";
 import LoginPage from "./pages/LoginPage";
+import RegisterAccount from "./pages/RegisterAccount";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import PrivateRotes from "./components/PrivateRotes";
@@ -11,6 +12,7 @@ function App() {
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterAccount />} />
 
           <Route element={<PrivateRotes />}>
             <Route path="/" element={<Room />} />
