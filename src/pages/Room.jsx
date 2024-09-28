@@ -119,7 +119,7 @@ function Room() {
     >
       <div
         id="main"
-        className="w-[60%] h-full bg-gray-900 px-4 py-4 flex flex-col"
+        className="w-full md:w-[60%] h-full bg-gray-900 px-4 py-4 flex flex-col"
       >
         <Header/>
         <div id="msgs-container" className="h-full overflow-y-scroll">
@@ -170,7 +170,7 @@ function Room() {
           />
           <input
             type="submit"
-            className="bg-pink-600 text-white font-semibold py-2 rounded-md px-5"
+            className="bg-pink-600 text-white font-semibold py-2 rounded-md px-5 cursor-pointer"
             value='Send'
           />
         </form>
