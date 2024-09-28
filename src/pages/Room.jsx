@@ -14,7 +14,7 @@ import { MdOutlineDelete } from "react-icons/md";
 
 import Header from "../components/Header";
 
-// Helper function to format the date
+
 const formatDate = (dateString) => {
   const options = {
     year: "2-digit",
@@ -30,9 +30,8 @@ const formatDate = (dateString) => {
 function Room() {
   const [messages, setMessages] = useState([]);
   const [messageBody, setMessageBody] = useState("");
-  const messagesEndRef = useRef(null); // Reference for scrolling
+  const messagesEndRef = useRef(null);
   const { user } = useAuth();
-  console.log("userId",user.$id)
 
 
   useEffect(() => {
@@ -75,7 +74,7 @@ function Room() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
 
     let payload = {
       body: messageBody,
@@ -125,7 +124,6 @@ function Room() {
         <Header/>
         <div id="msgs-container" className="h-full overflow-y-scroll">
           {messages.map((message) => (
-            // console.log('msg_uid',message.user_Id)
             <div
               id="msg"
               key={message.$id}
